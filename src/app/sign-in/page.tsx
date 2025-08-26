@@ -1,23 +1,39 @@
-"use client";
-import ensureAmplifyConfigured from "../../utils/amplify-client";
-import { signInWithRedirect } from "aws-amplify/auth";
-import { useEffect } from "react";
+'use client';
 
+import '@/utils/amplify-client';
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-ensureAmplifyConfigured();
+function RedirectOnAuth() {
+  const router = useRouter();
+  const { authStatus } = useAuthenticator();
 
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      const next = new URLSearchParams(window.location.search).get('next') || '/dashboard';
+      router.replace(next);
+    }
+  }, [authStatus, router]);
 
-export default function SignInPage() {
-useEffect(() => {
-(async () => {
-await signInWithRedirect();
-})();
-}, []);
+  return null; // no UI, just redirects when signed in
+}
 
-
-return (
-<main className="flex min-h-screen items-center justify-center">
-<p className="text-sm text-neutral-600">Redirecting to sign-in…</p>
-</main>
-);
+export default function LoginPage() {
+  return (
+      <Authenticator
+        signUpAttributes={['address', 'birthdate', 'email', 'name']}
+        formFields={{
+          signUp: {
+            name: { label: 'Full name', placeholder: 'Jane Doe', isRequired: true, order: 1 },
+            birthdate: { label: 'Birth date', placeholder: 'YYYY-MM-DD', order: 2 },
+            email: { order: 3 },
+            address: { label: 'Address', placeholder: 'Street, City, State/Region, Country', isRequired: true, order: 4 },
+          },
+        }}
+      >
+        <RedirectOnAuth />
+      </Authenticator>
+  );
 }

@@ -1,39 +1,35 @@
-'use client';
+"use client";
 
-import '@/utils/amplify-client';
-import '@aws-amplify/ui-react/styles.css';
-import { Authenticator } from '@aws-amplify/ui-react';
+import "@/utils/amplify-client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+
+// Super-simple DataTable features: search, sort, pagination (client-side)
 
 export default function DashboardPage() {
-  const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Child App';
-  const subdomain = process.env.NEXT_PUBLIC_SUBDOMAIN;
+  const router = useRouter();
+
+  // raw data
+  type ChildApp = {
+    id?: string;
+    appname?: string;
+    subdomain?: string;
+    manager?: string;
+    status?: string;
+    createdAt?: string | number | Date;
+    url?: string;
+    [key: string]: unknown;
+  };
 
   return (
     <main className="p-6">
-      <Authenticator>
-        {({ signOut, user }) => (
-          <div className="max-w-xl space-y-4">
-            <h1 className="text-2xl font-bold">{appName}</h1>
-            <p className="text-sm text-neutral-700">
-              Signed in as <strong>{user?.signInDetails?.loginId}</strong>
-            </p>
-            <div className="rounded-xl border p-4">
-              <p className="font-medium">Hello, tenant!</p>
-              <ul className="mt-2 text-sm text-neutral-700">
-                <li>Tenant ID: {tenantId}</li>
-                <li>Subdomain: {subdomain}</li>
-              </ul>
-            </div>
-            <button
-              onClick={signOut}
-              className="rounded-lg border px-3 py-1 text-sm hover:bg-neutral-50"
-            >
-              Sign out
-            </button>
-          </div>
-        )}
-      </Authenticator>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+      </div>
     </main>
   );
 }
+
+
